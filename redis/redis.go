@@ -10,9 +10,10 @@ type Cache interface {
 }
 
 type Basic interface {
-	Set(key, value string, ttl time.Duration) (string, error)
-	SetNX(key, ttl time.Duration) (string, error)
+	Set(key, value string, ttl time.Duration) error
+	SetNX(key, ttl time.Duration) error
 	Get(key string) (string, error)
+	Del(key string) error
 }
 
 func NewBasic(address string, opts ...Option) Basic {
@@ -21,14 +22,20 @@ func NewBasic(address string, opts ...Option) Basic {
 		o(c)
 	}
 
-	return &redigo{c: c, pool: &redis.Pool{
+	return &redigo{c: c, pool: redis.Pool{
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", address)
+			conn, err := redis.Dial("tcp", address)
 			if nil != err {
 				return nil, err
 			}
+			if c.auth {
+				if _, err := conn.Do("AUTH", c.password); err != nil {
+					conn.Close()
+					return nil, err
+				}
+			}
 
-			return c, nil
+			return conn, nil
 		},
 		TestOnBorrow:    nil,
 		MaxIdle:         c.maxIdle,

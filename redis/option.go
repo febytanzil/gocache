@@ -9,6 +9,8 @@ type config struct {
 	maxActive   int
 	maxIdle     int
 	wait        bool
+	password    string
+	auth        bool
 }
 
 func WithConnection(maxActive, maxIdle int, idleTimeout time.Duration) Option {
@@ -22,5 +24,12 @@ func WithConnection(maxActive, maxIdle int, idleTimeout time.Duration) Option {
 func WaitPool(wait bool) Option {
 	return func(c *config) {
 		c.wait = wait
+	}
+}
+
+func WithAuth(password string) Option {
+	return func(c *config) {
+		c.password = password
+		c.auth = true
 	}
 }
