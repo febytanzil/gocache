@@ -10,8 +10,8 @@ type Cache interface {
 }
 
 type Basic interface {
-	Set(key, value string, ttl time.Duration) error
-	SetNX(key, ttl time.Duration) error
+	Set(key, value string, expiry time.Duration) error
+	SetNX(key, ttl time.Duration) (bool, error)
 	Get(key string) (string, error)
 	Del(key string) error
 }
