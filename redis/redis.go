@@ -11,6 +11,8 @@ type Cache interface {
 
 type Basic interface {
 	Set(key, value string, expiry time.Duration) error
+	// SetNX only sets the key if it does not already exist & returns exist flag and error.
+	// It will return no error & exist will true if the key is already locked by some other client.
 	SetNX(key, ttl time.Duration) (bool, error)
 	Get(key string) (string, error)
 	Del(key string) error
