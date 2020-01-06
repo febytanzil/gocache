@@ -25,12 +25,12 @@ func (r *redigo) Set(key, value string, expiry time.Duration) error {
 	return err
 }
 
-func (r *redigo) SetNX(key, ttl time.Duration) (bool, error) {
+func (r *redigo) SetNX(key, value string, ttl time.Duration) (bool, error) {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	exist := false
-	_, err := conn.Do("SET", key, "1", "NX", "EX", ttl.Seconds())
+	_, err := conn.Do("SET", key, value, "NX", "EX", ttl.Seconds())
 	if redis.ErrNil == err {
 		exist = true
 	}
