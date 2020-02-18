@@ -30,8 +30,8 @@ func (r *redigo) SetNX(key, value string, ttl time.Duration) (bool, error) {
 	defer conn.Close()
 
 	exist := false
-	_, err := conn.Do("SET", key, value, "NX", "EX", ttl.Seconds())
-	if redis.ErrNil == err {
+	reply, err := conn.Do("SET", key, value, "NX", "EX", ttl.Seconds())
+	if redis.ErrNil == err || nil == reply {
 		exist = true
 	}
 
