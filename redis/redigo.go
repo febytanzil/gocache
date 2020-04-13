@@ -10,14 +10,14 @@ type redigo struct {
 	c    *config
 }
 
-func (r *redigo) Set(key, value string, expiry time.Duration) error {
+func (r *redigo) Set(key, value string, expire time.Duration) error {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	var err error
 
-	if expiry.Seconds() > 0 {
-		_, err = conn.Do("SET", key, value, "EX", expiry.Seconds())
+	if expire.Seconds() > 0 {
+		_, err = conn.Do("SET", key, value, "EX", int64(expire.Seconds()))
 	} else {
 		_, err = conn.Do("SET", key, value)
 	}
@@ -25,12 +25,12 @@ func (r *redigo) Set(key, value string, expiry time.Duration) error {
 	return err
 }
 
-func (r *redigo) SetNX(key, value string, ttl time.Duration) (bool, error) {
+func (r *redigo) SetNX(key, value string, expire time.Duration) (bool, error) {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	exist := false
-	reply, err := conn.Do("SET", key, value, "NX", "EX", ttl.Seconds())
+	reply, err := conn.Do("SET", key, value, "NX", "EX", int64(expire.Seconds()))
 	if redis.ErrNil == err || nil == reply {
 		exist = true
 	}
